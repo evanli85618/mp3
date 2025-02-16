@@ -1,21 +1,7 @@
 // Define the MP3 module namespace
 namespace mp3Player {
     let DATA_PIN: DigitalPin = DigitalPin.P0;
-    const CMD_DELAY = 5000; // Command delay
-
-    export enum ControlCommand {
-        Play = 0x01,
-        Pause = 0x02,
-        Stop = 0x04,
-        Previous = 0x05,
-        Next = 0x06,
-        Reset = 0x07
-    }
-
-    export enum PlayMode {
-        Loop = 0x08,
-        Random = 0x09
-    }
+    const CMD_DELAY = 6000; // Command delay
 
     //% block="Set pin $pin"
     //% pin.defl=DigitalPin.P0
@@ -26,7 +12,7 @@ namespace mp3Player {
     }
 
     function createCommand(cmd: number, dataH: number, dataL: number): number {
-        return ((cmd << 12) | (dataH << 8) | dataL) & 0xFFFF;
+        return ((cmd << 4) | dataH) << 8 | dataL;
     }
 
     function sendByte(dat: number): void {
@@ -47,16 +33,15 @@ namespace mp3Player {
             }
             dat <<= 1;
         }
-
         pins.digitalWritePin(DATA_PIN, 1);
         control.waitMicros(CMD_DELAY);
     }
 
     //% block="Set volume %volume"
-    //% volume.min=0 volume.max=10
+    //% volume.min=0 volume.max=30
     //% weight=80
     export function setVolume(volume: number): void {
-        const command = createCommand(0x06, 0x00, Math.clamp(0, 10, volume));
+        const command = createCommand(0x04, 0x00, Math.clamp(0, 30, volume));
         sendByte(command);
     }
 
@@ -64,7 +49,6 @@ namespace mp3Player {
     //% num.min=1 num.max=1023
     //% weight=70
     export function playTrack(num: number): void {
-        num = Math.clamp(1, 1023, num);
         const command = createCommand(0x03, (num >> 8) & 0xFF, num & 0xFF);
         sendByte(command);
     }
@@ -73,16 +57,55 @@ namespace mp3Player {
     //% num.min=1 num.max=1023
     //% weight=60
     export function loopTrack(num: number): void {
-        num = Math.clamp(1, 1023, num);
-        const command = createCommand(0x04, (num >> 8) & 0xFF, num & 0xFF);
+        const command = createCommand(0x0D, (num >> 8) & 0xFF, num & 0xFF);
         sendByte(command);
     }
 
+    //% block="Previous track"
+    //% weight=90
+    export function previousTrack(): void {
+        sendByte(createCommand(0x01, 0x00, 0x00));
+    }
+
+    //% block="Next track"
+    //% weight=85
+    export function nextTrack(): void {
+        sendByte(createCommand(0x02, 0x00, 0x00));
+    }
+
+    //% block="Reset module"
+    //% weight=75
+    export function resetModule(): void {
+        sendByte(createCommand(0x05, 0x05, 0x00));
+    }
+
+    //% block="Play"
+    //% weight=95
+    export function play(): void {
+        sendByte(createCommand(0x06, 0x01, 0x00));
+    }
+
+    //% block="Pause"
+    //% weight=94
+    export function pause(): void {
+        sendByte(createCommand(0x06, 0x02, 0x00));
+    }
+
+    //% block="Stop"
+    //% weight=93
+    export function stop(): void {
+        sendByte(createCommand(0x06, 0x04, 0x00));
+    }
+
     //% block="List play mode %mode"
-    //% mode.shadow="dropdown"
     //% weight=50
-    export function listPlayMode(mode: PlayMode): void {
-        const command = createCommand(0x0F, mode, 0x00);
+    export function listPlayMode(mode: number): void {
+        let command;
+        if (mode == 0) {
+            command = createCommand(0x06, 0x06, 0x00); // Loop Play
+        } else {
+            command = createCommand(0x0A, 0x02, 0x00); // Random Play
+        }
         sendByte(command);
     }
 }
