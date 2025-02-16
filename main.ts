@@ -25,6 +25,13 @@ namespace mp3Player {
         NextTrack
     }
 
+    export enum PlayModeOnceLoop {
+        //% block="once"
+        Once,
+        //% block="loop"
+        Loop
+    }
+
     //% block="Set pin $pin"
     //% pin.defl=DigitalPin.P1
     //% weight=100
@@ -71,8 +78,6 @@ namespace mp3Player {
         sendByte(command);
     }
 
-
-
     function createCommand(cmd: number, dataH: number, dataL: number): number {
         return ((cmd << 4) | dataH) << 8 | dataL;
     }
@@ -107,31 +112,40 @@ namespace mp3Player {
         sendByte(command);
     }
 
+    //% block="Play song index $num || mode $mode"
+    //% num.defl=1 num.min=0 num.max=1023
+    //% mode.defl=mp3Player.PlayModeOnceLoop.Once
+    //% expandableArgumentMode="enabled"
+    //% weight=70
+    export function playSong(num: number, mode?: PlayModeOnceLoop): void {
+        const cmd = (mode === PlayModeOnceLoop.Loop) ? 0x0D : 0x03;
+        const command = createCommand(cmd, (num >> 8) & 0xFF, num & 0xFF);
+        sendByte(command);
+    }
+
     //% block="Play track %num"
     //% num.defl=1 num.min=1 num.max=1023
     //% weight=70
-    export function playTrack(num: number): void {
-        const command = createCommand(0x03, (num >> 8) & 0xFF, num & 0xFF);
-        sendByte(command);
+    function playTrack(num: number): void {
+        playSong(num, PlayModeOnceLoop.Once);
     }
 
     //% block="Loop track %num"
     //% num.defl=4 num.min=1 num.max=1023
     //% weight=60
-    export function loopTrack(num: number): void {
-        const command = createCommand(0x0D, (num >> 8) & 0xFF, num & 0xFF);
-        sendByte(command);
+    function loopTrack(num: number): void {
+        playSong(num, PlayModeOnceLoop.Loop);
     }
 
     //% block="Previous track"
     //% weight=90
-    export function previousTrack(): void {
+    function previousTrack(): void {
         sendByte(createCommand(0x02, 0x00, 0x00));
     }
 
     //% block="Next track"
     //% weight=85
-    export function nextTrack(): void {
+    function nextTrack(): void {
         sendByte(createCommand(0x01, 0x00, 0x00));
     }
 
@@ -139,30 +153,30 @@ namespace mp3Player {
     //% weight=75
     function resetModule(): void {
         sendByte(createCommand(0x05, 0x05, 0x00));
-        basic.pause(20);
+        basic.pause(50);
     }
 
     //% block="Play"
     //% weight=95
-    export function play(): void {
+    function play(): void {
         sendByte(createCommand(0x06, 0x01, 0x00));
     }
 
     //% block="Pause"
     //% weight=94
-    export function pause(): void {
+    function pause(): void {
         sendByte(createCommand(0x06, 0x02, 0x00));
     }
 
     //% block="Stop"
     //% weight=93
-    export function stop(): void {
+    function stop(): void {
         sendByte(createCommand(0x06, 0x03, 0x00));
     }
 
     //% block="Play/Pause"
     //% weight=92
-    export function playPause(): void {
+    function playPause(): void {
         sendByte(createCommand(0x06, 0x05, 0x00));
     }
 
