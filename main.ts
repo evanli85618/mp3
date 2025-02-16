@@ -11,11 +11,12 @@ namespace mp3Player {
     }
 
     //% block="Set pin $pin"
-    //% pin.defl=DigitalPin.P0
+    //% pin.defl=DigitalPin.P1
     //% weight=100
      function setPin(pin: DigitalPin): void {
         DATA_PIN = pin;
         pins.digitalWritePin(DATA_PIN, 1); // Initialize high
+        resetModule();
     }
 
     //% block="Set pin $pin and volume %volume"
@@ -93,7 +94,7 @@ namespace mp3Player {
     //% weight=75
     function resetModule(): void {
         sendByte(createCommand(0x05, 0x05, 0x00));
-        basic.pause(3);
+        basic.pause(5);
     }
 
     //% block="Play"
