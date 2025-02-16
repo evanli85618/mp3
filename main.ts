@@ -3,6 +3,13 @@ namespace mp3Player {
     let DATA_PIN: DigitalPin = DigitalPin.P0;
     const CMD_DELAY = 6000; // Command delay
 
+    export enum PlayMode {
+        //% block="Loop"
+        Loop,
+        //% block="Random"
+        Random
+    }
+
     //% block="Set pin $pin"
     //% pin.defl=DigitalPin.P0
     //% weight=100
@@ -106,9 +113,10 @@ namespace mp3Player {
 
     //% block="List play mode %mode"
     //% weight=50
-    export function listPlayMode(mode: number): void {
+    //% mode.defl=mp3Player.PlayMode.Loop  // 设置默认值
+    export function listPlayMode(mode: PlayMode): void {
         let command;
-        if (mode == 0) {
+        if (mode === PlayMode.Loop) {
             command = createCommand(0x06, 0x06, 0x00); // Loop Play
         } else {
             command = createCommand(0x0A, 0x02, 0x00); // Random Play
