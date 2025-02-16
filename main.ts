@@ -10,6 +10,21 @@ namespace mp3Player {
         Random
     }
 
+    export enum CMD {
+        //% block="Play"
+        Play,
+        //% block="Pause"
+        Pause,
+        //% block="Stop"
+        Stop,
+        //% block="Play/Pause"
+        PlayPause,
+        //% block="Previous track"
+        PreviousTrack,
+        //% block="Next track"
+        NextTrack
+    }
+
     //% block="Set pin $pin"
     //% pin.defl=DigitalPin.P1
     //% weight=100
@@ -27,6 +42,36 @@ namespace mp3Player {
         setPin(pin);
         setVolume(volume);
     }
+
+    //% block="mp3 CMD $cmd"
+    //% cmd.defl=mp3Player.CMD.Play
+    //% weight=96
+    export function mp3Command(cmd: CMD): void {
+        let command;
+        switch (cmd) {
+            case CMD.Play:
+                command = createCommand(0x06, 0x01, 0x00);
+                break;
+            case CMD.Pause:
+                command = createCommand(0x06, 0x02, 0x00);
+                break;
+            case CMD.Stop:
+                command = createCommand(0x06, 0x03, 0x00);
+                break;
+            case CMD.PlayPause:
+                command = createCommand(0x06, 0x05, 0x00);
+                break;
+            case CMD.PreviousTrack:
+                command = createCommand(0x02, 0x00, 0x00);
+                break;
+            case CMD.NextTrack:
+                command = createCommand(0x01, 0x00, 0x00);
+                break;
+        }
+        sendByte(command);
+    }
+
+
 
     function createCommand(cmd: number, dataH: number, dataL: number): number {
         return ((cmd << 4) | dataH) << 8 | dataL;
@@ -94,7 +139,7 @@ namespace mp3Player {
     //% weight=75
     function resetModule(): void {
         sendByte(createCommand(0x05, 0x05, 0x00));
-        basic.pause(5);
+        basic.pause(20);
     }
 
     //% block="Play"
