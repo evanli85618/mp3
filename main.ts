@@ -77,6 +77,7 @@ namespace mp3Player {
     //% weight=75
     export function resetModule(): void {
         sendByte(createCommand(0x05, 0x05, 0x00));
+        basic.pause(3);
     }
 
     //% block="Play"
@@ -95,6 +96,12 @@ namespace mp3Player {
     //% weight=93
     export function stop(): void {
         sendByte(createCommand(0x06, 0x03, 0x00));
+    }
+
+    //% block="Play/Pause"
+    //% weight=92
+    export function playPause(): void {
+        sendByte(createCommand(0x06, 0x05, 0x00));
     }
 
     //% block="List play mode %mode"
