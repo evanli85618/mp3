@@ -1,6 +1,6 @@
 {
-    "name": "MP3",
-    "description": "",
+    "name": "mp3player",
+    "description": "A simple MP3 module controlled by a single I/O pin.",
     "dependencies": {
         "core": "*",
         "radio": "*",
