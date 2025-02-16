@@ -13,9 +13,18 @@ namespace mp3Player {
     //% block="Set pin $pin"
     //% pin.defl=DigitalPin.P0
     //% weight=100
-    export function setPin(pin: DigitalPin): void {
+     function setPin(pin: DigitalPin): void {
         DATA_PIN = pin;
         pins.digitalWritePin(DATA_PIN, 1); // Initialize high
+    }
+
+    //% block="Set pin $pin and volume %volume"
+    //% pin.defl=DigitalPin.P0
+    //% volume.defl=20 volume.min=0 volume.max=30
+    //% weight=99
+    export function setPinAndVolume(pin: DigitalPin, volume: number): void {
+        setPin(pin);
+        setVolume(volume);
     }
 
     function createCommand(cmd: number, dataH: number, dataL: number): number {
@@ -45,7 +54,7 @@ namespace mp3Player {
     }
 
     //% block="Set volume %volume"
-    //% volume.min=0 volume.max=30
+    //% volume.defl=20 volume.min=0 volume.max=30
     //% weight=80
     export function setVolume(volume: number): void {
         const command = createCommand(0x04, 0x00, Math.clamp(0, 30, volume));
@@ -53,7 +62,7 @@ namespace mp3Player {
     }
 
     //% block="Play track %num"
-    //% num.min=1 num.max=1023
+    //% num.defl=1 num.min=1 num.max=1023
     //% weight=70
     export function playTrack(num: number): void {
         const command = createCommand(0x03, (num >> 8) & 0xFF, num & 0xFF);
@@ -61,7 +70,7 @@ namespace mp3Player {
     }
 
     //% block="Loop track %num"
-    //% num.min=1 num.max=1023
+    //% num.defl=4 num.min=1 num.max=1023
     //% weight=60
     export function loopTrack(num: number): void {
         const command = createCommand(0x0D, (num >> 8) & 0xFF, num & 0xFF);
