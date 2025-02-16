@@ -42,7 +42,7 @@ namespace mp3Player {
     }
 
     //% block="Set pin $pin and volume %volume"
-    //% pin.defl=DigitalPin.P0
+    //% pin.defl=DigitalPin.P1
     //% volume.defl=20 volume.min=0 volume.max=30
     //% weight=99
     export function setPinAndVolume(pin: DigitalPin, volume: number): void {
@@ -105,7 +105,7 @@ namespace mp3Player {
     }
 
     //% block="Set volume %volume"
-    //% volume.defl=20 volume.min=0 volume.max=30
+    //% volume.defl=30 volume.min=0 volume.max=30
     //% weight=80
     export function setVolume(volume: number): void {
         const command = createCommand(0x04, 0x00, Math.clamp(0, 30, volume));
@@ -180,10 +180,10 @@ namespace mp3Player {
         sendByte(createCommand(0x06, 0x05, 0x00));
     }
 
-    //% block="List play mode %mode"
+    //% block="Play list mode %mode"
     //% weight=50
     //% mode.defl=mp3Player.PlayMode.Loop  // 设置默认值
-    export function listPlayMode(mode: PlayMode): void {
+    export function playListMode(mode: PlayMode): void {
         let command;
         if (mode === PlayMode.Loop) {
             command = createCommand(0x06, 0x06, 0x00); // Loop Play
