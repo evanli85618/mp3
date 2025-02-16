@@ -24,9 +24,9 @@ namespace mp3Player {
     }
 
     export enum PlayModeOnceLoop {
-        //% block="once"
+        //% block="Play Once"
         Once,
-        //% block="loop"
+        //% block="Repeat"
         Loop
     }
 
@@ -40,7 +40,7 @@ namespace mp3Player {
 
         /**
          * Constructor: Initialize the pin and set the volume.
-         * @param pin Data pin
+         * @param pin Data pin.
          * @param volume Initial volume, default is 30.
          */
         constructor(pin: DigitalPin, volume: number = 30) {
@@ -76,10 +76,10 @@ namespace mp3Player {
         }
 
         /**
-         * Set volume.
+         * Set MP3 volume.
          * @param volume Volume value, range 0-30.
          */
-        //% blockId="mp3player_setVolume" block="%player|set volume %volume" volume.defl=30 volume.min=0 volume.max=30 weight=80
+        //% blockId="mp3player_setVolume" block="%player|set MP3 volume to %volume" volume.defl=30 volume.min=0 volume.max=30 weight=80
         public setVolume(volume: number): void {
             const command = this.createCommand(0x04, 0x00, Math.clamp(0, 30, volume));
             this.sendByte(command);
@@ -89,7 +89,7 @@ namespace mp3Player {
          * Send MP3 command.
          * @param cmd Command type.
          */
-        //% blockId="mp3player_mp3Command" block="%player|mp3 CMD %cmd" weight=96
+        //% blockId="mp3player_mp3Command" block="%player|send MP3 command %cmd" weight=96
         public mp3Command(cmd: CMD): void {
             let command: number;
             switch (cmd) {
@@ -116,11 +116,11 @@ namespace mp3Player {
         }
 
         /**
-         * Play song by index.
-         * @param num Song index.
-         * @param mode Play mode, default is once.
+         * Play song by number.
+         * @param num Song number.
+         * @param mode Play mode, default is Play Once.
          */
-        //% blockId="mp3player_playSong" block="%player|play song index %num||mode %mode" num.defl=1 num.min=0 num.max=1023 mode.defl=mp3Player.PlayModeOnceLoop.Once weight=70
+        //% blockId="mp3player_playSong" block="%player|play song number %num || mode %mode" num.defl=1 num.min=0 num.max=1023 mode.defl=mp3Player.PlayModeOnceLoop.Once weight=70
         public playSong(num: number, mode?: PlayModeOnceLoop): void {
             const cmd = (mode === PlayModeOnceLoop.Loop) ? 0x0D : 0x03;
             const command = this.createCommand(cmd, (num >> 8) & 0xFF, num & 0xFF);
@@ -212,10 +212,10 @@ namespace mp3Player {
         }
 
         /**
-         * Set play list mode.
-         * @param mode List mode, supports loop or random play.
+         * Set playback mode.
+         * @param mode Playback mode, supports Loop or Random.
          */
-        //% blockId="mp3player_playListMode" block="%player|play list mode %mode" mode.defl=mp3Player.PlayMode.Loop weight=50
+        //% blockId="mp3player_playListMode" block="%player|playlist playback mode %mode" mode.defl=mp3Player.PlayMode.Loop weight=50
         public playListMode(mode: PlayMode): void {
             let command: number;
             if (mode === PlayMode.Loop) {
@@ -228,12 +228,12 @@ namespace mp3Player {
     }
 
     /**
-     * Factory function to create a new MP3Player object.
+     * create a new MP3Player object.
      * @param pin Data pin.
-     * @param volume Initial volume (default is 30).
+     * @param volume Initial volume (default is 15).
      */
-    //% blockId="mp3player_create" block="MP3Player at pin %pin with volume %volume" volume.defl=30 volume.min=0 volume.max=30 weight=100 blockSetVariable=player
-    export function create(pin: DigitalPin, volume: number = 30): MP3Player {
+    //% blockId="mp3player_create" block="Init MP3 on pin %pin with volume %volume" pin.defl=DigitalPin.P1 volume.defl=15 volume.min=0 volume.max=30 weight=100 blockSetVariable=player
+    export function create(pin: DigitalPin, volume: number = 15): MP3Player {
         return new MP3Player(pin, volume);
     }
 }
