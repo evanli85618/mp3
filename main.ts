@@ -1,14 +1,14 @@
 // Define the MP3 module namespace
-namespace mp3Player {
+namespace mp3player {
 
-    export enum PlayMode {
+    export enum PlaylistMode {
         //% block="Loop"
         Loop,
         //% block="Random"
         Random
     }
 
-    export enum CMD {
+    export enum Mp3Command {
         //% block="Play"
         Play,
         //% block="Pause"
@@ -23,11 +23,11 @@ namespace mp3Player {
         NextTrack
     }
 
-    export enum PlayModeOnceLoop {
+    export enum SongMode {
         //% block="Play Once"
-        Once,
+        PlayOnce,
         //% block="Repeat"
-        Loop
+        Repeat
     }
 
     const CMD_DELAY = 6000; // Command delay
@@ -89,26 +89,26 @@ namespace mp3Player {
          * Send MP3 command.
          * @param cmd Command type.
          */
-        //% blockId="mp3player_mp3Command" block="%player|send MP3 command %cmd" weight=96
-        public mp3Command(cmd: CMD): void {
+        //% blockId="mp3player_sendCommand" block="%player|send MP3 command %cmd" weight=96
+        public sendCommand(cmd: Mp3Command): void {
             let command: number;
             switch (cmd) {
-                case CMD.Play:
+                case Mp3Command.Play:
                     command = this.createCommand(0x06, 0x01, 0x00);
                     break;
-                case CMD.Pause:
+                case Mp3Command.Pause:
                     command = this.createCommand(0x06, 0x02, 0x00);
                     break;
-                case CMD.Stop:
+                case Mp3Command.Stop:
                     command = this.createCommand(0x06, 0x03, 0x00);
                     break;
-                case CMD.PlayPause:
+                case Mp3Command.PlayPause:
                     command = this.createCommand(0x06, 0x05, 0x00);
                     break;
-                case CMD.PreviousTrack:
+                case Mp3Command.PreviousTrack:
                     command = this.createCommand(0x02, 0x00, 0x00);
                     break;
-                case CMD.NextTrack:
+                case Mp3Command.NextTrack:
                     command = this.createCommand(0x01, 0x00, 0x00);
                     break;
             }
@@ -118,11 +118,11 @@ namespace mp3Player {
         /**
          * Play song by number.
          * @param num Song number.
-         * @param mode Play mode, default is Play Once.
+         * @param mode Song mode, default is Play Once.
          */
-        //% blockId="mp3player_playSong" block="%player|play song number %num || mode %mode" num.defl=1 num.min=0 num.max=1023 mode.defl=mp3Player.PlayModeOnceLoop.Once weight=70
-        public playSong(num: number, mode?: PlayModeOnceLoop): void {
-            const cmd = (mode === PlayModeOnceLoop.Loop) ? 0x0D : 0x03;
+        //% blockId="mp3player_playSong" block="%player|play song number %num || mode %mode" num.defl=1 num.min=0 num.max=1023 mode.defl=mp3player.SongMode.PlayOnce weight=70
+        public playSong(num: number, mode?: SongMode): void {
+            const cmd = (mode === SongMode.Repeat) ? 0x0D : 0x03;
             const command = this.createCommand(cmd, (num >> 8) & 0xFF, num & 0xFF);
             this.sendByte(command);
         }
@@ -134,7 +134,7 @@ namespace mp3Player {
         //% blockId="mp3player_playTrack" block="%player|play track %num" num.defl=1 num.min=1 num.max=1023 weight=70
         //% blockHidden=true
         public playTrack(num: number): void {
-            this.playSong(num, PlayModeOnceLoop.Once);
+            this.playSong(num, SongMode.PlayOnce);
         }
 
         /**
@@ -144,7 +144,7 @@ namespace mp3Player {
         //% blockId="mp3player_loopTrack" block="%player|loop track %num" num.defl=4 num.min=1 num.max=1023 weight=60
         //% blockHidden=true
         public loopTrack(num: number): void {
-            this.playSong(num, PlayModeOnceLoop.Loop);
+            this.playSong(num, SongMode.Repeat);
         }
 
         /**
@@ -212,23 +212,23 @@ namespace mp3Player {
         }
 
         /**
-         * Set playback mode.
-         * @param mode Playback mode, supports Loop or Random.
+         * Set playlist mode.
+         * @param mode Playlist mode, supports Loop or Random.
          */
-        //% blockId="mp3player_playListMode" block="%player|playlist playback mode %mode" mode.defl=mp3Player.PlayMode.Loop weight=50
-        public playListMode(mode: PlayMode): void {
+        //% blockId="mp3player_setPlaylistMode" block="%player|set playlist mode %mode" mode.defl=mp3player.PlaylistMode.Loop weight=50
+        public setPlaylistMode(mode: PlaylistMode): void {
             let command: number;
-            if (mode === PlayMode.Loop) {
-                command = this.createCommand(0x06, 0x06, 0x00); // Loop play.
+            if (mode === PlaylistMode.Loop) {
+                command = this.createCommand(0x06, 0x06, 0x00);
             } else {
-                command = this.createCommand(0x0A, 0x02, 0x00); // Random play.
+                command = this.createCommand(0x0A, 0x02, 0x00);
             }
             this.sendByte(command);
         }
     }
 
     /**
-     * create a new MP3Player object.
+     * Factory function to create a new MP3Player object.
      * @param pin Data pin.
      * @param volume Initial volume (default is 15).
      */
