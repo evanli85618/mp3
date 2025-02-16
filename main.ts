@@ -33,19 +33,19 @@ namespace mp3Player {
     const CMD_DELAY = 6000; // Command delay
 
     /**
-     * MP3Player 类，用于操作 MP3 模块
+     * MP3Player class for controlling the MP3 module.
      */
     export class MP3Player {
         private dataPin: DigitalPin;
 
         /**
-         * 构造函数，初始化引脚并设置音量
-         * @param pin 数据引脚
-         * @param volume 初始音量，默认为 30
+         * Constructor: Initialize the pin and set the volume.
+         * @param pin Data pin
+         * @param volume Initial volume, default is 30.
          */
         constructor(pin: DigitalPin, volume: number = 30) {
             this.dataPin = pin;
-            pins.digitalWritePin(this.dataPin, 1); // 初始化为高电平
+            pins.digitalWritePin(this.dataPin, 1); // Initialize high.
             this.resetModule();
             this.setVolume(volume);
         }
@@ -76,20 +76,20 @@ namespace mp3Player {
         }
 
         /**
-         * 设置音量
-         * @param volume 音量值，范围 0-30
+         * Set volume.
+         * @param volume Volume value, range 0-30.
          */
-        //% blockId="mp3player_setVolume" block="%this|set volume %volume" volume.defl=30 volume.min=0 volume.max=30 weight=80
+        //% blockId="mp3player_setVolume" block="%player|set volume %volume" volume.defl=30 volume.min=0 volume.max=30 weight=80
         public setVolume(volume: number): void {
             const command = this.createCommand(0x04, 0x00, Math.clamp(0, 30, volume));
             this.sendByte(command);
         }
 
         /**
-         * 发送 MP3 命令
-         * @param cmd 命令类型
+         * Send MP3 command.
+         * @param cmd Command type.
          */
-        //% blockId="mp3player_mp3Command" block="%this|mp3 CMD %cmd" weight=96
+        //% blockId="mp3player_mp3Command" block="%player|mp3 CMD %cmd" weight=96
         public mp3Command(cmd: CMD): void {
             let command: number;
             switch (cmd) {
@@ -116,11 +116,11 @@ namespace mp3Player {
         }
 
         /**
-         * 播放指定曲目
-         * @param num 曲目索引
-         * @param mode 播放模式，默认为一次播放
+         * Play song by index.
+         * @param num Song index.
+         * @param mode Play mode, default is once.
          */
-        //% blockId="mp3player_playSong" block="%this|play song index %num||mode %mode" num.defl=1 num.min=0 num.max=1023 mode.defl=mp3Player.PlayModeOnceLoop.Once weight=70
+        //% blockId="mp3player_playSong" block="%player|play song index %num||mode %mode" num.defl=1 num.min=0 num.max=1023 mode.defl=mp3Player.PlayModeOnceLoop.Once weight=70
         public playSong(num: number, mode?: PlayModeOnceLoop): void {
             const cmd = (mode === PlayModeOnceLoop.Loop) ? 0x0D : 0x03;
             const command = this.createCommand(cmd, (num >> 8) & 0xFF, num & 0xFF);
@@ -128,100 +128,109 @@ namespace mp3Player {
         }
 
         /**
-         * 播放单曲（一次播放）
-         * @param num 曲目编号
+         * Play a track once.
+         * @param num Track number.
          */
-        //% blockId="mp3player_playTrack" block="%this|play track %num" num.defl=1 num.min=1 num.max=1023 weight=70
+        //% blockId="mp3player_playTrack" block="%player|play track %num" num.defl=1 num.min=1 num.max=1023 weight=70
+        //% blockHidden=true
         public playTrack(num: number): void {
             this.playSong(num, PlayModeOnceLoop.Once);
         }
 
         /**
-         * 循环播放曲目
-         * @param num 曲目编号
+         * Loop a track.
+         * @param num Track number.
          */
-        //% blockId="mp3player_loopTrack" block="%this|loop track %num" num.defl=4 num.min=1 num.max=1023 weight=60
+        //% blockId="mp3player_loopTrack" block="%player|loop track %num" num.defl=4 num.min=1 num.max=1023 weight=60
+        //% blockHidden=true
         public loopTrack(num: number): void {
             this.playSong(num, PlayModeOnceLoop.Loop);
         }
 
         /**
-         * 播放上一曲
+         * Play the previous track.
          */
-        //% blockId="mp3player_previousTrack" block="%this|previous track" weight=90
+        //% blockId="mp3player_previousTrack" block="%player|previous track" weight=90
+        //% blockHidden=true
         public previousTrack(): void {
             this.sendByte(this.createCommand(0x02, 0x00, 0x00));
         }
 
         /**
-         * 播放下一曲
+         * Play the next track.
          */
-        //% blockId="mp3player_nextTrack" block="%this|next track" weight=85
+        //% blockId="mp3player_nextTrack" block="%player|next track" weight=85
+        //% blockHidden=true
         public nextTrack(): void {
             this.sendByte(this.createCommand(0x01, 0x00, 0x00));
         }
 
         /**
-         * 重置模块
+         * Reset the module.
          */
-        //% blockId="mp3player_resetModule" block="%this|reset module" weight=75
+        //% blockId="mp3player_resetModule" block="%player|reset module" weight=75
+        //% blockHidden=true
         public resetModule(): void {
             this.sendByte(this.createCommand(0x05, 0x05, 0x00));
             basic.pause(50);
         }
 
         /**
-         * 播放
+         * Play.
          */
-        //% blockId="mp3player_play" block="%this|Play" weight=95
+        //% blockId="mp3player_play" block="%player|Play" weight=95
+        //% blockHidden=true
         public play(): void {
             this.sendByte(this.createCommand(0x06, 0x01, 0x00));
         }
 
         /**
-         * 暂停
+         * Pause.
          */
-        //% blockId="mp3player_pause" block="%this|Pause" weight=94
+        //% blockId="mp3player_pause" block="%player|Pause" weight=94
+        //% blockHidden=true
         public pause(): void {
             this.sendByte(this.createCommand(0x06, 0x02, 0x00));
         }
 
         /**
-         * 停止
+         * Stop.
          */
-        //% blockId="mp3player_stop" block="%this|Stop" weight=93
+        //% blockId="mp3player_stop" block="%player|Stop" weight=93
+        //% blockHidden=true
         public stop(): void {
             this.sendByte(this.createCommand(0x06, 0x03, 0x00));
         }
 
         /**
-         * 切换播放/暂停状态
+         * Toggle play/pause.
          */
-        //% blockId="mp3player_playPause" block="%this|Play/Pause" weight=92
+        //% blockId="mp3player_playPause" block="%player|Play/Pause" weight=92
+        //% blockHidden=true
         public playPause(): void {
             this.sendByte(this.createCommand(0x06, 0x05, 0x00));
         }
 
         /**
-         * 设置播放列表模式
-         * @param mode 列表模式，支持循环或随机播放
+         * Set play list mode.
+         * @param mode List mode, supports loop or random play.
          */
-        //% blockId="mp3player_playListMode" block="%this|play list mode %mode" mode.defl=mp3Player.PlayMode.Loop weight=50
+        //% blockId="mp3player_playListMode" block="%player|play list mode %mode" mode.defl=mp3Player.PlayMode.Loop weight=50
         public playListMode(mode: PlayMode): void {
             let command: number;
             if (mode === PlayMode.Loop) {
-                command = this.createCommand(0x06, 0x06, 0x00); // 循环播放
+                command = this.createCommand(0x06, 0x06, 0x00); // Loop play.
             } else {
-                command = this.createCommand(0x0A, 0x02, 0x00); // 随机播放
+                command = this.createCommand(0x0A, 0x02, 0x00); // Random play.
             }
             this.sendByte(command);
         }
     }
 
     /**
-     * 工厂函数，用于创建新的 MP3Player 对象
-     * @param pin 数据引脚
-     * @param volume 初始音量（默认30）
+     * Factory function to create a new MP3Player object.
+     * @param pin Data pin.
+     * @param volume Initial volume (default is 30).
      */
     //% blockId="mp3player_create" block="MP3Player at pin %pin with volume %volume" volume.defl=30 volume.min=0 volume.max=30 weight=100 blockSetVariable=player
     export function create(pin: DigitalPin, volume: number = 30): MP3Player {
