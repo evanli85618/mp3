@@ -91,7 +91,7 @@ namespace mp3Player {
 
     //% block="Reset module"
     //% weight=75
-    export function resetModule(): void {
+    function resetModule(): void {
         sendByte(createCommand(0x05, 0x05, 0x00));
         basic.pause(3);
     }
