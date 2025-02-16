@@ -64,13 +64,13 @@ namespace mp3Player {
     //% block="Previous track"
     //% weight=90
     export function previousTrack(): void {
-        sendByte(createCommand(0x01, 0x00, 0x00));
+        sendByte(createCommand(0x02, 0x00, 0x00));
     }
 
     //% block="Next track"
     //% weight=85
     export function nextTrack(): void {
-        sendByte(createCommand(0x02, 0x00, 0x00));
+        sendByte(createCommand(0x01, 0x00, 0x00));
     }
 
     //% block="Reset module"
@@ -94,7 +94,7 @@ namespace mp3Player {
     //% block="Stop"
     //% weight=93
     export function stop(): void {
-        sendByte(createCommand(0x06, 0x04, 0x00));
+        sendByte(createCommand(0x06, 0x03, 0x00));
     }
 
     //% block="List play mode %mode"
